@@ -1,0 +1,39 @@
+package com.touchfootball.gui;
+
+import com.touchfootball.TouchFootball;
+
+public class Screens implements ScreenLoadable {
+
+	private TouchFootball game;
+	
+	public MainMenuScreen mainMenuScreen;
+	public GamePlayScreen gamePlayScreen;
+	public ArcadeGameScreen arcadeGameScreen;
+	// public SettingsScreen settingsScreen;
+	// public PlayBookScreen playBookScreen;
+	// public HelpScreen helpScreen;
+	
+	public Screens(TouchFootball g)
+	{
+		this.game = g;
+		this.init();
+	}
+	
+	@Override
+	public void init ()
+	{
+		this.mainMenuScreen = new MainMenuScreen(game);
+		this.gamePlayScreen = new GamePlayScreen(game);
+		this.arcadeGameScreen = new ArcadeGameScreen(game);
+		// this.settingsScreen = new SettingsScreen(game);
+		// this.playBookScreen = new PlayBookScreen(game);
+		// this.helpScreen = new HelpScreen(game);
+	}
+
+	@Override
+	public void load () {
+		// TODO Auto-generated method stub
+		this.mainMenuScreen.load();
+		this.gamePlayScreen.load();
+	}
+}

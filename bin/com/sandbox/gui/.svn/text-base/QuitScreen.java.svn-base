@@ -1,0 +1,13 @@
+package com.touchfootball.gui;
+
+import com.badlogic.gdx.Game;
+import com.touchfootball.TouchFootball;
+
+public class QuitScreen extends AbstractScreen {
+
+	public QuitScreen(TouchFootball game) {
+		super(game);
+		// TODO Auto-generated constructor stub
+	}
+
+}

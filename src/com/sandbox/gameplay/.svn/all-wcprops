@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/coms309/B5/!svn/ver/366/trunk/touchfootball-desktop/src/com/touchfootball/gameplay
+END
+Players.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/coms309/B5/!svn/ver/298/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Players.java
+END
+GameObject.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/coms309/B5/!svn/ver/303/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/GameObject.java
+END
+Football.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/coms309/B5/!svn/ver/366/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Football.java
+END
+Field.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/coms309/B5/!svn/ver/366/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Field.java
+END
+GameClock.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/coms309/B5/!svn/ver/359/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/GameClock.java
+END
+DynamicGameObject.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/coms309/B5/!svn/ver/348/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/DynamicGameObject.java
+END
+Play.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/coms309/B5/!svn/ver/313/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Play.java
+END
+Team.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/coms309/B5/!svn/ver/298/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Team.java
+END
+Neighborhood.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/coms309/B5/!svn/ver/279/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Neighborhood.java
+END
+Constants.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/coms309/B5/!svn/ver/279/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Constants.java
+END
+Player.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/coms309/B5/!svn/ver/366/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Player.java
+END
+Action.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/coms309/B5/!svn/ver/279/trunk/touchfootball-desktop/src/com/touchfootball/gameplay/Action.java
+END

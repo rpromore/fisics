@@ -1,0 +1,303 @@
+package com.touchfootball.gameplay;
+
+import java.util.ArrayList;
+
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
+import com.touchfootball.graphics.Assets;
+
+public class DynamicGameObject extends GameObject {
+	
+	public float mass;
+	public final Vector2 velocity;
+	public final Vector2 acceleration;
+	
+	protected float maxVelocity = 2;
+	protected float maxAcceleration = 2;
+	
+	private ArrayList<Vector2> targets;
+	
+	protected Neighborhood neighborhood;
+
+	public DynamicGameObject (float x, float y, float width, float height) {
+		this(x, y, width, height, 1, null);
+	}
+	public DynamicGameObject (float x, float y, float width, float height, float mass, Neighborhood hood) {
+		super(x, y, width, height);
+		this.mass = mass;
+		this.velocity = new Vector2(0, 0);
+		this.acceleration = new Vector2(0, 0);
+		this.targets = new ArrayList<Vector2>();
+		this.targets.add(new Vector2());
+		this.neighborhood = hood;
+		this.maxVelocity = 2;
+		this.maxAcceleration = 2;
+	}
+	
+	// ................................................................................................................
+	
+	public boolean checkBounds() {
+		return (int) getX() > -410 // left
+				&& (int) getX() < 440 - width*2 // right
+				&& (int) getY() < 865 - height*2 // top
+				&& (int) getY() > -865;
+	}
+	
+	public boolean collidesWith(GameObject p) {	
+		if (p != null){
+//			return x < p.x+p.width && x > p.x && y < p.y+p.height && y > p.y;
+			return super.intersects(p);
+		}
+		return false;
+	}
+	
+	public boolean collidesWith(DynamicGameObject p) {
+		if (p != null){
+
+			Float bot1 = (float) (this.y - 2);
+			Float left1 = this.x + 3;
+			Float right1 = left1 + 20;
+			Float top1 = bot1 +20;
+			Float bot2 = (float) (p.y - 2);
+			Float left2 = p.x + 3;
+			Float right2 = left2 + 20;
+			Float top2 = bot2 +20;
+			if(bot1 > top2 || bot2 > top1) return false;
+			if(left1 > right2 || left2 > right1) return false;
+			return true;
+
+			//return super.intersects(p);
+		}
+		return false;
+	}
+	
+	public boolean colliding(SpriteBatch batch, boolean resolve) {
+		ArrayList<DynamicGameObject> collidingWith = new ArrayList<DynamicGameObject>();
+		for( DynamicGameObject p : neighborhood.getNeighbors() ) 
+		{
+			if( !equals(p) && collidesWith(p) && color != p.color) {
+				collidingWith.add(p);
+				if( batch != null ) {
+					batch.draw(Assets.player_colliding, x - 4, y + 3, 0, 0,
+							34, 34, 1, 1, 0);
+					batch.draw(Assets.player_colliding, p.x - 4, p.y + 3, 0, 0,
+							34, 34, 1, 1, 0);
+				}
+			}
+		}
+		if( resolve )
+			resolveCollisions(collidingWith);
+		return collidingWith.size() != 0;
+	}
+				
+	public void resolveCollisions(ArrayList<DynamicGameObject> players) {
+		for( DynamicGameObject p : players ) {
+			// http://stackoverflow.com/questions/345838/ball-to-ball-collision-detection-and-handling
+			Vector2 delta = position().sub(p.position());
+			float d = delta.len();
+			Vector2 mtd = new Vector2();
+			if( d == 0f ) {
+				mtd = delta.cpy().mul((radius() + p.radius()-d)/d);
+			}
+			else {
+				d = p.radius() + radius() - 1.0f;
+				delta = new Vector2(p.radius() + radius(), 0.0f);
+
+				mtd = delta.cpy().mul(((radius() + p.radius())-d)/d);
+			}
+			
+			float im1 = 1/getMass();
+			float im2 = 1/p.getMass();
+			
+			position(position().add(mtd.cpy().mul(im1 / (im1 + im2))));
+			p.position(p.position().sub(mtd.cpy().mul(im2 / (im1 + im2))));
+			
+			Vector2 v = velocity.cpy().sub(p.velocity);
+			float vn = v.dot(mtd.cpy().nor());
+			
+			if( vn > 0f ) return;
+			
+			float i = (float) ((-(1.0f+.085)*vn)/(im1+im2));
+			Vector2 impulse = mtd.cpy().mul(i).nor();
+			
+			velocity.add(impulse.cpy().nor().mul(im1));
+			p.velocity.sub(impulse.cpy().nor().mul(im2));
+			
+		}
+	}	
+	public boolean isColliding(ArrayList<DynamicGameObject> players) {
+		for( DynamicGameObject p : players ) {
+			p = (Player) p;
+			if( !equals(p) && collidesWith(p) ) 
+				return true;
+		}
+		return false;
+	}
+	public boolean collidesWithinRange(DynamicGameObject p, int range) {
+		if( getY() < getTargets().get(0).y ) {
+			if (p != null && getX() < p.getX() + getWidth() + range && getX() > p.getX() - range
+					&& getY() < p.getY() + getHeight() && getY() > p.getY() - range)
+				return true;
+		}
+		else {
+			if (p != null && getX() < p.getX() + p.getWidth() + range && getX() > p.getX() - range
+					&& getY() < p.getY() + p.getHeight() + range && getY() > p.getY() )
+				return true;
+		}
+		if (p != null && getX() < p.getX() + p.getWidth() + range && getX() > p.getX() - range
+				&& getY() < p.getY() + p.getHeight() + range && getY() > p.getY() - range )
+			return true;
+		return false;
+	}
+	
+	// ................................................................................................................
+	public float getMass() {
+		return this.mass;
+	}
+	public void setMass(float m) {
+		this.mass = m;
+	}
+	public float mass() {
+		return this.mass;
+	}
+	public void mass(float m) {
+		this.mass = m;
+	}
+	public Vector2 getVelocity() {
+		return this.velocity;
+	}
+	public void setVelocity(Vector2 v) {
+		this.velocity.set(v);
+	}
+	public void setVelocity(float x, float y) {
+		this.velocity.set(x, y);
+	}
+	public Vector2 velocity() {
+		return this.velocity;
+	}
+	public void velocity(Vector2 v) {
+		this.velocity.set(v);
+	}
+	public void velocity(float x, float y) {
+		this.velocity.set(x, y);
+	}
+	public Vector2 getAcceleration() {
+		return this.acceleration;
+	}
+	public void setAcceleration(Vector2 a) {
+		this.acceleration.set(a);
+	}
+	public void setAcceleration(float x, float y) {
+		this.acceleration.set(x, y);
+	}
+	public Vector2 acceleration() {
+		return this.acceleration;
+	}
+	public void acceleration(Vector2 a) {
+		this.acceleration.set(a);
+	}
+	public void acceleration(float x, float y) {
+		this.acceleration.set(x, y);
+	}
+	public Vector2 accel() {
+		return this.acceleration;
+	}
+	public void accel(Vector2 a) {
+		this.acceleration.set(a);
+	}
+	public void accel(float x, float y) {
+		this.acceleration.set(x, y);
+	}
+	public float getMaxVelocity() {
+		return this.maxVelocity;
+	}
+	public void setMaxVelocity(float m) {
+		this.maxVelocity = m;
+	}
+	public float maxVelocity() {
+		return this.maxVelocity;
+	}
+	public void maxVelocity(float m) {
+		this.maxVelocity = m;
+	}
+	public float getMaxAcceleration() {
+		return this.maxAcceleration;
+	}
+	public void setMaxAcceleration(float m) {
+		this.maxAcceleration = m;
+	}
+	public float maxAcceleration() {
+		return this.maxAcceleration;
+	}
+	public void maxAcceleration(float m) {
+		this.maxAcceleration = m;
+	}
+	public float maxAccel() {
+		return this.maxAcceleration;
+	}
+	public void maxAccel(float m) {
+		this.maxAcceleration = m;
+	}
+	
+	public ArrayList<Vector2> getTargets() {
+		return this.targets;
+	}
+	public void setTargets(ArrayList<Vector2> v){
+		this.targets = v;
+	}
+	public Vector2 getTarget() {
+		if( this.targets.size() > 0 )
+			return this.targets.get(0);
+		else
+			return new Vector2();
+	}
+	public void setTarget(Vector2 v) {
+		if( this.targets.size() > 0 )
+			this.targets.set(0, v);
+		else
+			this.targets.add(v);
+	}
+	public void setTarget(int x, int y) {
+		if( this.targets.size() > 0)
+			this.targets.set(0, new Vector2(x, y));
+		else
+			this.targets.add(new Vector2(x, y));
+	}
+	public void addTarget(Vector2 v){
+		this.targets.add(v);
+	}
+	public void addTarget(int x, int y){
+		this.targets.add(new Vector2(x, y));
+	}
+	public ArrayList<Vector2> targets() {
+		return this.targets;
+	}
+	public void targets(ArrayList<Vector2> v){
+		this.targets = v;
+	}
+	public Vector2 target() {
+		if( this.targets.size() > 0 )
+			return this.targets.get(0);
+		else
+			return new Vector2();
+	}
+	public void target(Vector2 v) {
+		if( this.targets.size() > 0 )
+			this.targets.set(0, v);
+		else
+			this.targets.add(v);
+	}
+	public void target(int x, int y) {
+		if( this.targets.size() > 0)
+			this.targets.set(0, new Vector2(x, y));
+		else
+			this.targets.add(new Vector2(x, y));
+	}
+	
+	public Neighborhood neighborhood() {
+		return neighborhood;
+	}
+	public void neighborhood(Neighborhood n) {
+		neighborhood = n;
+	}
+}
