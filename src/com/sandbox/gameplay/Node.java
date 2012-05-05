@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Node {
 	private Vector3 position, velocity, target, acceleration;
-	private float width, height, radius, gravity, maxVelocity, maxAcceleration;
+	private float width, height, radius, gravity, maxVelocity, maxAcceleration, volume, density;
 	private BigInteger mass;
 	Neighborhood neighborhood;
 
@@ -33,6 +33,8 @@ public class Node {
 		this.height = height;
 		this.radius = radius;
 		this.mass = mass;
+		this.volume = (float) ((4/3) * Math.PI * Math.pow(radius, 3));
+		this.density = mass.floatValue()/volume;
 		this.neighborhood = neighborhood;
 		this.target = new Vector3(0, 0, 0);
 		this.maxVelocity = maxVelocity;
