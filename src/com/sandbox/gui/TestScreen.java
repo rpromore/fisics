@@ -12,8 +12,12 @@ import com.sandbox.gameplay.Shape;
 import com.sandbox.graphics.Draw;
 
 public class TestScreen extends AbstractScreen {
-	Nodes nodes;
-	Shape shape;
+	Nodes shapes;
+	Nodes rect;
+	Nodes tri;
+	
+	Shape rectangle;
+	Shape triangle;
 	
 	Vector3 _touchPoint = new Vector3();
 
@@ -25,13 +29,27 @@ public class TestScreen extends AbstractScreen {
 	public void show() {
 		super.show();
 		
-		nodes = new Nodes();
-		nodes.add(new Node(0, 0, 5, 5));
-		nodes.add(new Node(100, 0, 5, 5));
-		nodes.add(new Node(100, -100, 5, 5));
-		nodes.add(new Node(0, -100, 5, 5));
+		shapes = new Nodes();
 		
-		shape = new Shape(nodes.getNeighbors());
+		rect = new Nodes();
+		rect.add(new Node(0, 0, 5, 5));
+		rect.add(new Node(100, 0, 5, 5));
+		rect.add(new Node(100, -100, 5, 5));
+		rect.add(new Node(0, -100, 5, 5));
+		
+		rectangle = new Shape(rect.getNeighbors());
+		rectangle.mass(new BigInteger("100000"));
+		
+		tri = new Nodes();
+		tri.add(new Node(50, 200, 5, 5));
+		tri.add(new Node(0, 100, 5, 5));
+		tri.add(new Node(100, 100, 5, 5));
+		
+		triangle = new Shape(tri.getNeighbors());
+		
+		shapes.add(rectangle);
+		shapes.add(triangle);
+		
 	}
 	
 	@Override
@@ -46,7 +64,8 @@ public class TestScreen extends AbstractScreen {
 		batch.enableBlending();
 		batch.setProjectionMatrix(camera.combined);
 		
-		shape.draw(camera);
+		rectangle.draw(camera);
+		triangle.draw(camera);
 		
 		batch.end();
 		
@@ -67,7 +86,7 @@ public class TestScreen extends AbstractScreen {
 		if (Gdx.input.isTouched()) {
 			camera.unproject(_touchPoint.set(Gdx.input.getX(),
 					Gdx.input.getY(), 0));
-			nodes.get(0).position(_touchPoint);			
+			triangle.position(_touchPoint);			
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
@@ -100,18 +119,18 @@ public class TestScreen extends AbstractScreen {
 			if (sleep > 2)
 				sleep -= 1;
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.F3))
-			nodes.get(0).mass(nodes.get(0).mass().add(new BigInteger("1000000000000")));
-		if (Gdx.input.isKeyPressed(Input.Keys.F4))
-			nodes.get(0).mass(nodes.get(0).mass().subtract(new BigInteger("1000000000000")));
-		if (Gdx.input.isKeyPressed(Input.Keys.L))
-			nodes.get(0).velocity(nodes.get(0).velocity().add(new Vector3(.1f, 0, 0)));
-		if (Gdx.input.isKeyPressed(Input.Keys.I))
-			nodes.get(0).velocity(nodes.get(0).velocity().add(new Vector3(0, .1f, 0)));
-		if (Gdx.input.isKeyPressed(Input.Keys.J))
-			nodes.get(0).velocity(nodes.get(0).velocity().sub(new Vector3(.1f, 0, 0)));
-		if (Gdx.input.isKeyPressed(Input.Keys.K))
-			nodes.get(0).velocity(nodes.get(0).velocity().sub(new Vector3(0, .1f, 0)));
+//		if (Gdx.input.isKeyPressed(Input.Keys.F3))
+//			nodes.get(0).mass(nodes.get(0).mass().add(new BigInteger("1000000000000")));
+//		if (Gdx.input.isKeyPressed(Input.Keys.F4))
+//			nodes.get(0).mass(nodes.get(0).mass().subtract(new BigInteger("1000000000000")));
+//		if (Gdx.input.isKeyPressed(Input.Keys.L))
+//			nodes.get(0).velocity(nodes.get(0).velocity().add(new Vector3(.1f, 0, 0)));
+//		if (Gdx.input.isKeyPressed(Input.Keys.I))
+//			nodes.get(0).velocity(nodes.get(0).velocity().add(new Vector3(0, .1f, 0)));
+//		if (Gdx.input.isKeyPressed(Input.Keys.J))
+//			nodes.get(0).velocity(nodes.get(0).velocity().sub(new Vector3(.1f, 0, 0)));
+//		if (Gdx.input.isKeyPressed(Input.Keys.K))
+//			nodes.get(0).velocity(nodes.get(0).velocity().sub(new Vector3(0, .1f, 0)));
 	}
 
 }

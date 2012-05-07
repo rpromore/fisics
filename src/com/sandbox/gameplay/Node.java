@@ -234,7 +234,6 @@ public class Node {
 	}
 	
 	public void gravity() {
-		// TODO Decide if this should stay.
 		if( neighborhood != null ) {
 			acceleration.mul(0);
 			float g = (float) (6.674*Math.pow(10, -11));
@@ -256,6 +255,5 @@ public class Node {
 	public void move() {
 		velocity.add(acceleration);
 		position.add(velocity);
-		
 	}
 }

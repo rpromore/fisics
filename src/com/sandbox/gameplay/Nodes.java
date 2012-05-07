@@ -10,17 +10,16 @@ public class Nodes implements Neighborhood {
 		return nodes;
 	}
 
-	@Override
-	public double getRadius() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
 	public void add(Node n) {
+		n.neighborhood = this;
 		nodes.add(n);
 	}
 	
 	public Node get(int i) {
 		return nodes.get(i);
+	}
+	
+	public void clear() {
+		nodes.clear();
 	}
 }

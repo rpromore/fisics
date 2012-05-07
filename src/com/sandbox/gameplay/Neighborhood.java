@@ -5,5 +5,4 @@ import java.util.Collection;
 
 public interface Neighborhood {
 	ArrayList<Node> getNeighbors();
-    double getRadius();
 }
