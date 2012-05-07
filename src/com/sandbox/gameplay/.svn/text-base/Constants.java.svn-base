@@ -1,5 +1,0 @@
-package com.touchfootball.gameplay;
-
-public class Constants {
-	public static long time = 0;
-}

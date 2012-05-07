@@ -1,9 +1,0 @@
-package com.touchfootball.gameplay;
-
-import com.touchfootball.gameplay.Player.Behavior;
-
-
-public interface Action 
-{
-	Behavior selectAction();
-}

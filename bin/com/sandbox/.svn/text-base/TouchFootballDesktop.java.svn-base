@@ -1,9 +1,0 @@
-package com.touchfootball;
-
-import com.badlogic.gdx.backends.jogl.JoglApplication;
-
-public class TouchFootballDesktop {
-	public static void main (String[] argv) {
-		new JoglApplication(new TouchFootball(), "TouchFootball", 480, 800, false);
-	}
-}

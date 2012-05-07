@@ -1,9 +1,0 @@
-package com.touchfootball.gui;
-
-public interface ScreenLoadable {
-	
-	public void init();
-	
-	public void load();
-	
-}
