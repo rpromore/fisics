@@ -13,6 +13,14 @@ public class Node {
 
 	// CONSTRUCTORS
 
+	public Node(float x, float y) {
+		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 100, 100, 50, new BigInteger("1"),
+				null, 100, .1f);
+	}
+	public Node(float x, float y, float width, float height) {
+		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), width, height, (float) Math.sqrt(Math.pow(width, 2)+Math.pow(height,  2))*.5f, new BigInteger("1"),
+				null, 100, .1f);
+	}
 	public Node(float x, float y, Neighborhood neighborhood) {
 		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 100, 100, 50, new BigInteger("1"),
 				neighborhood, 100, .1f);
@@ -168,14 +176,18 @@ public class Node {
 	}
 
 	public boolean colliding() {
-		ArrayList<Node> collidingWith = new ArrayList<Node>();
-		for (Node n : neighborhood.getNeighbors()) {
-			if (collidesWith(n)) {
-				collidingWith.add(n);
+		if( neighborhood != null ) {
+			ArrayList<Node> collidingWith = new ArrayList<Node>();
+			for (Node n : neighborhood.getNeighbors()) {
+				if (collidesWith(n)) {
+					collidingWith.add(n);
+				}
 			}
+			resolveCollisions(collidingWith);
+	
+			return collidingWith.size() > 0;
 		}
-		resolveCollisions(collidingWith);
-		return collidingWith.size() > 0;
+		return false;
 	}
 
 	public void resolveCollisions(ArrayList<Node> nodes) {
@@ -223,18 +235,20 @@ public class Node {
 	
 	public void gravity() {
 		// TODO Decide if this should stay.
-		acceleration.mul(0);
-		float g = (float) (6.674*Math.pow(10, -11));
-		for( Node n : neighborhood.getNeighbors() ) {
-			if( !equals(n) ) {
-				float m = n.mass.floatValue()*mass.floatValue();
-				Vector3 p = n.position.cpy().sub(position);
-				float d = p.len2();
-				p.nor();
-				float f = (float) (g*m)/d;
-				p.mul(f);
-				p.div(mass.floatValue());
-				acceleration.add(p);
+		if( neighborhood != null ) {
+			acceleration.mul(0);
+			float g = (float) (6.674*Math.pow(10, -11));
+			for( Node n : neighborhood.getNeighbors() ) {
+				if( !equals(n) ) {
+					float m = n.mass.floatValue()*mass.floatValue();
+					Vector3 p = n.position.cpy().sub(position);
+					float d = p.len2();
+					p.nor();
+					float f = (float) (g*m)/d;
+					p.mul(f);
+					p.div(mass.floatValue());
+					acceleration.add(p);
+				}
 			}
 		}
 	}

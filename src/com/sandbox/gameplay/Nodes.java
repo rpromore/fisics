@@ -7,7 +7,7 @@ public class Nodes implements Neighborhood {
 	private ArrayList<Node> nodes = new ArrayList<Node>();
 	
 	@Override
-	public Collection<Locomotion> findNearby(Locomotion boid) {
+	public Collection<Node> findNearby(Node boid) {
 		// TODO Auto-generated method stub
 		return null;
 	}

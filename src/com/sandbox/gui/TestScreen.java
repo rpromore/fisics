@@ -10,10 +10,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.sandbox.Sandbox;
 import com.sandbox.gameplay.Node;
 import com.sandbox.gameplay.Nodes;
+import com.sandbox.gameplay.Shape;
 import com.sandbox.graphics.Draw;
 
 public class TestScreen extends AbstractScreen {
 	Nodes nodes;
+	Shape shape;
 	
 	Vector3 _touchPoint = new Vector3();
 
@@ -25,6 +27,14 @@ public class TestScreen extends AbstractScreen {
 	public void show() {
 		super.show();
 		
+//		Nodes points = new Nodes();
+//		points.add(new Point(0, 0));
+//		points.add(new Point(100, 0));
+//		points.add(new Point(100, -100));
+//		points.add(new Point(100, -200));
+//		points.add(new Point(50, -200));
+//		points.add(new Point(0, -100));
+		
 		nodes = new Nodes();
 //		Node n1 = new Node(0, 0, nodes);
 //		n1.acceleration(1.1f);
@@ -34,15 +44,22 @@ public class TestScreen extends AbstractScreen {
 //		Node n2 = new Node(100, 100, nodes);
 //		nodes.add(n2);
 		Random gen = new Random();
-		Node n = new Node(-100, -100, 100, 100, nodes);
+		Node n = new Node(-100, 100, 5, 5, nodes);
 		n.mass(new BigInteger("100000"));
 		nodes.add(n);
-		for( int i = 0; i < 100; i++ ) {
-			n = new Node(gen.nextInt(300), gen.nextInt(300), 25, 25, nodes);
+//		for( int i = 0; i < 100; i++ ) {
+//			n = new Node(gen.nextInt(300), gen.nextInt(300), 25, 25, nodes);
 //			if( i == 0 )
 //				n.mass(new BigInteger("100000"));
-			nodes.add(n);
-		}
+//			nodes.add(n);
+//		}
+		
+		nodes.add(new Node(0, 0, 5, 5));
+		nodes.add(new Node(100, 0, 5, 5));
+		nodes.add(new Node(100, -100, 5, 5));
+		nodes.add(new Node(0, -100, 5, 5));
+		
+		shape = new Shape(nodes.getNeighbors());
 	}
 	
 	@Override
@@ -57,6 +74,8 @@ public class TestScreen extends AbstractScreen {
 		batch.enableBlending();
 		batch.setProjectionMatrix(camera.combined);
 		
+		shape.draw(camera);
+		
 		// Vector3 p_before = nodes.get(3).position();
 		
 //		Node n = nodes.getNeighbors().get(0);
@@ -67,8 +86,6 @@ public class TestScreen extends AbstractScreen {
 		
 		// for( int i = 0; i < nodes.getNeighbors().size(); i++ ) {
 		for( Node n : nodes.getNeighbors() ) {
-			//Node n = nodes.getNeighbors().get(i);
-			// n.arrive(n.target());
 			n.gravity();
 			n.move();
 			n.colliding();
