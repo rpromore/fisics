@@ -6,8 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Vector3;
 import com.sandbox.Sandbox;
-import com.sandbox.gameplay.Node;
 import com.sandbox.gameplay.Nodes;
+import com.sandbox.gameplay.Particle;
 import com.sandbox.gameplay.Shape;
 import com.sandbox.graphics.Draw;
 
@@ -30,22 +30,27 @@ public class TestScreen extends AbstractScreen {
 		super.show();
 		
 		shapes = new Nodes();
+//		shapes.add(new Particle(0, 0, 5, 5));
+//		Particle p = new Particle(30, 0, 10, 10);
+//		p.velocity(new Vector3(-.1f, 0, 0));
+//		shapes.add(p);
 		
 		rect = new Nodes();
-		rect.add(new Node(0, 0, 5, 5));
-		rect.add(new Node(100, 0, 5, 5));
-		rect.add(new Node(100, -100, 5, 5));
-		rect.add(new Node(0, -100, 5, 5));
+		rect.add(new Particle(0, 0, 5, 5));
+		rect.add(new Particle(100, 0, 5, 5));
+		rect.add(new Particle(100, -100, 5, 5));
+		rect.add(new Particle(0, -100, 5, 5));
 		
 		rectangle = new Shape(rect.getNeighbors());
 		rectangle.mass(new BigInteger("100000"));
 		
 		tri = new Nodes();
-		tri.add(new Node(50, 200, 5, 5));
-		tri.add(new Node(0, 100, 5, 5));
-		tri.add(new Node(100, 100, 5, 5));
+		tri.add(new Particle(50, 200, 5, 5));
+		tri.add(new Particle(0, 100, 5, 5));
+		tri.add(new Particle(100, 100, 5, 5));
 		
 		triangle = new Shape(tri.getNeighbors());
+		triangle.velocity(new Vector3(0, -1, 0));
 		
 		shapes.add(rectangle);
 		shapes.add(triangle);
@@ -53,7 +58,7 @@ public class TestScreen extends AbstractScreen {
 	}
 	
 	@Override
-	public void render(float delta) {
+	public void render(float delta) {		
 		camera.update();
 		camera.apply(gl);
 		
@@ -64,7 +69,17 @@ public class TestScreen extends AbstractScreen {
 		batch.enableBlending();
 		batch.setProjectionMatrix(camera.combined);
 		
+//		for( Node n : shapes.getNeighbors() ) {
+//			n.move();
+//			n.draw(camera);
+//		}
+		
+//		rectangle.colliding();
+//		triangle.colliding();
+		
+//		System.out.println("RECTANGLE");
 		rectangle.draw(camera);
+//		System.out.println("TRIANGLE");
 		triangle.draw(camera);
 		
 		batch.end();

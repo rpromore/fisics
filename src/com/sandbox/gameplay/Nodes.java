@@ -11,7 +11,7 @@ public class Nodes implements Neighborhood {
 	}
 
 	public void add(Node n) {
-		n.neighborhood = this;
+		n.neighborhood(this);
 		nodes.add(n);
 	}
 	

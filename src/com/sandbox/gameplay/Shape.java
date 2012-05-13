@@ -1,5 +1,6 @@
 package com.sandbox.gameplay;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -7,84 +8,96 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 
-public class Shape extends Node implements Neighborhood {
+public class Shape extends Particle implements Neighborhood {
 	private ArrayList<Node> vertices;
 	private ShapeRenderer sr = new ShapeRenderer();
+	private AABB bounds = new AABB();
 	
 	public Shape(ArrayList<Node> v) {
 		super(v.get(0).getX(), v.get(0).getY());
-		for( Node n : v ) {
-			n.neighborhood = this;
-		}
 		vertices = v;
+		updateBounds();
 	}
 	
-	@Override
-	public float getX() {
-		return vertices.get(0).getX();
-	}
-	@Override
-	public float getY() {
-		return vertices.get(0).getY();
-	}
-	@Override
-	public float getZ() {
-		return vertices.get(0).getZ();
-	}
-	
-	@Override
-	public Vector3 position() {
-		return vertices.get(0).position();
-	}
-	@Override
-	public void position(Vector3 p) {
-		Vector3 difference = vertices.get(0).position().cpy().sub(p);
+	public void updateBounds() {
+		Vector3 min = vertices.get(0).position().cpy();
+		Vector3 max = vertices.get(vertices.size()-1).position().cpy();
+		
 		for( Node n : vertices ) {
-			n.position(n.position().sub(difference));
+			if( n.position().x < min.x )
+				min.x = n.position().x;
+			if( n.position().y < min.y )
+				min.y = n.position().y;
+			if( n.position().z < min.z )
+				min.z = n.position().z;
+			
+			if( n.position().x > max.x )
+				max.x = n.position().x;
+			if( n.position().y > max.y )
+				max.y = n.position().y;
+			if( n.position().z > max.z )
+				max.z = n.position().z;
 		}
+		
+		bounds.lower(min);
+		bounds.upper(max);
 	}
 	
-	@Override
-	public Vector3 velocity() {
-		// TODO should this be an average of all nodes?
-		return vertices.get(0).velocity();
-	}
-	@Override
-	public void velocity(Vector3 p) {
-		Vector3 difference = vertices.get(0).velocity().cpy().sub(p);
-		for( Node n : vertices ) {
-			n.velocity(n.velocity().sub(difference));
+	public boolean intersects(Shape other) {
+		// 	using this page for help:
+		// 		http://www.wildbunny.co.uk/blog/2011/04/20/collision-detection-for-dummies/
+		
+		// 	First we do AABB vs AABB collision test since it's easier and faster to calculate 
+		//	than a more complex collision test.
+		if( bounds.intersects(other.bounds) ) {
+			return true;
 		}
+		
+		return false;
 	}
 	
-	@Override
-	public Vector3 acceleration() {
-		// TODO should this be an average of all nodes?
-		return vertices.get(0).acceleration();
-	}
-	@Override
-	public void acceleration(Vector3 p) {
-		Vector3 difference = vertices.get(0).acceleration().cpy().sub(p);
-		for( Node n : vertices ) {
-			n.acceleration(n.acceleration().sub(difference));
+	public boolean collidesWith(Node n) {
+		Shape s = (Shape) n;
+		if (n != null && !equals(s)) {
+			return intersects(s);
 		}
+		return false;
+	}
+
+	public boolean colliding() {
+		if( neighborhood != null ) {
+			ArrayList<Particle> collidingWith = new ArrayList<Particle>();
+			for (Node n : neighborhood.getNeighbors()) {
+				Particle p = (Particle) n;
+				if (collidesWith(n)) {
+					collidingWith.add(p);
+				}
+			}
+			resolveCollisions(collidingWith);
+	
+			return collidingWith.size() > 0;
+		}
+		return false;
 	}
 	
-	// Colliding: 	edge-to-edge collisions.
 	// Mass: 		distribute mass equally among all points, i.e. uniform mass. Ponder this.
 	
 	public void update() {
-//		for( Node n : vertices ) {
-//			n.move();
-//			n.gravity();
-//			n.colliding();
-//		}
+		colliding();
+		// gravity();
+		move();
+		updateBounds();
 	}
 	
 	public void draw(OrthographicCamera camera) {
 		update();
 		camera.update();
 		sr.setProjectionMatrix(camera.combined);
+		
+		sr.begin(ShapeType.FilledCircle);
+		sr.setColor(0, 1, 0, 1);
+		sr.filledCircle(bounds.center().x, bounds.center().y, 5);
+		sr.end();
 		
 		for( int i = 0; i < vertices.size(); i++ ) {
 			Node cp = vertices.get(i);
@@ -105,9 +118,113 @@ public class Shape extends Node implements Neighborhood {
 			sr.end();
 		}
 	}
+	
+	public void move() {
+//		for( Node n : vertices ) {
+//			n.velocity().add(acceleration());
+//			n.position(n.position().add(velocity()));
+//		}
+		velocity().add(acceleration());
+		position(position().add(velocity()));
+		updateBounds();
+	}
+	
+	@Override
+	public float getX() {
+		return bounds.center().x;
+	}
+	@Override
+	public float getY() {
+		return bounds.center().y;
+	}
+	@Override
+	public float getZ() {
+		return bounds.center().z;
+	}
+	
+	@Override
+	public Vector3 position() {
+		return bounds.center();
+	}
+	@Override
+	public void position(Vector3 p) {
+		Vector3 difference = bounds.center().cpy().sub(p);
+		for( Node n : vertices ) {
+			n.position().sub(difference);
+		}
+	}
 
 	@Override
 	public ArrayList<Node> getNeighbors() {
 		return vertices;
+	}
+
+	@Override
+	public Neighborhood neighborhood() {
+		return neighborhood;
+	}
+
+	@Override
+	public void neighborhood(Neighborhood n) {
+		neighborhood = n;
+	}
+
+	@Override
+	public void target(Vector3 t) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void target(int x, int y) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void target(float x, float y) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Vector3 target() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public float radius() {
+		return bounds.center().len();
+	}
+
+	@Override
+	public void radius(float r) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public BigInteger mass() {
+		// TODO
+		return null;
+	}
+
+	@Override
+	public void mass(BigInteger m) {
+		// TODO
+		// mass = m;
+	}
+
+	@Override
+	public void maxVelocity(int n) {
+		// TODO
+		// maxVelocity = n;
+	}
+
+	@Override
+	public float maxVelocity() {
+		// TODO
+		return 0;
 	}
 }
