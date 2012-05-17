@@ -1,23 +1,29 @@
 package com.sandbox.gui;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.sandbox.Sandbox;
+import com.sandbox.gameplay.Node;
 import com.sandbox.gameplay.Nodes;
 import com.sandbox.gameplay.Particle;
 import com.sandbox.gameplay.Shape;
-import com.sandbox.graphics.Draw;
 
 public class TestScreen extends AbstractScreen {
 	Nodes shapes;
+	
 	Nodes rect;
 	Nodes tri;
+	Nodes lin;
 	
 	Shape rectangle;
 	Shape triangle;
+	Shape line;
 	
 	Vector3 _touchPoint = new Vector3();
 
@@ -29,13 +35,16 @@ public class TestScreen extends AbstractScreen {
 	public void show() {
 		super.show();
 		
+		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		camera.update(true);
+		
 		shapes = new Nodes();
 //		shapes.add(new Particle(0, 0, 5, 5));
 //		Particle p = new Particle(30, 0, 10, 10);
 //		p.velocity(new Vector3(-.1f, 0, 0));
 //		shapes.add(p);
 		
-		rect = new Nodes();
+		/*rect = new Nodes();
 		rect.add(new Particle(0, 0, 5, 5));
 		rect.add(new Particle(100, 0, 5, 5));
 		rect.add(new Particle(100, -100, 5, 5));
@@ -50,20 +59,55 @@ public class TestScreen extends AbstractScreen {
 		tri.add(new Particle(100, 100, 5, 5));
 		
 		triangle = new Shape(tri.getNeighbors());
-		triangle.velocity(new Vector3(0, -1, 0));
+		triangle.velocity(new Vector3(0, -1, 0));*/
 		
-		shapes.add(rectangle);
-		shapes.add(triangle);
+//		lin = new Nodes();
+//		lin.add(new Particle(0, 0, 5, 5));
+//		lin.add(new Particle(0, 100, 5, 5));
+		
+//		line = new Shape(lin.getNeighbors());
+//		line.velocity(new Vector3(0, -.1f, 0));
+		
+//		shapes.add(rectangle);
+//		shapes.add(triangle);
+//		shapes.add(line);
+		
+		float r = 0f;
+		
+		Particle ass = new Particle(-100, 0, new BigDecimal("100"), new BigDecimal("100")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
+		ass.mass(new BigDecimal("597360000000"));
+		ass.velocity(new Vector3(0, 0, 0));
+		ass.restitution(r);
+		shapes.add(ass);
+		
+		Particle ass2 = new Particle(0, 0, new BigDecimal("2"), new BigDecimal("2"));
+		ass2.mass(new BigDecimal("1"));
+		ass2.velocity(new Vector3(0, 0, 0));
+		ass2.restitution(r);
+		shapes.add(ass2);
+//		
+//		Particle ass3 = new Particle(0, 100, 10, 10);
+//		ass3.velocity(new Vector3(0, 0, 0));
+//		ass3.restitution(r);
+//		shapes.add(ass3);
+//		
+//		Particle ass4 = new Particle(0, -100, 10, 10);
+//		ass4.velocity(new Vector3(0, 0, 0));
+//		ass4.restitution(r);
+//		shapes.add(ass4);
 		
 	}
 	
 	@Override
 	public void render(float delta) {		
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
+        gl.glEnable(GL10.GL_DEPTH_TEST);
+        
 		camera.update();
 		camera.apply(gl);
 		
-		Draw draw = new Draw(camera);
-		draw.update();
+//		Draw draw = new Draw(camera);
+//		draw.update();
 		
 		batch.begin();
 		batch.enableBlending();
@@ -78,9 +122,13 @@ public class TestScreen extends AbstractScreen {
 //		triangle.colliding();
 		
 //		System.out.println("RECTANGLE");
-		rectangle.draw(camera);
+//		rectangle.draw(camera);
 //		System.out.println("TRIANGLE");
-		triangle.draw(camera);
+//		triangle.draw(camera);
+		
+		for( Node n : shapes.getNeighbors() ) {
+			n.draw(camera);
+		}
 		
 		batch.end();
 		
@@ -101,7 +149,7 @@ public class TestScreen extends AbstractScreen {
 		if (Gdx.input.isTouched()) {
 			camera.unproject(_touchPoint.set(Gdx.input.getX(),
 					Gdx.input.getY(), 0));
-			triangle.position(_touchPoint);			
+			shapes.get(0).position(_touchPoint);			
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
@@ -112,6 +160,10 @@ public class TestScreen extends AbstractScreen {
 			if (camera.zoom > .0001)
 				camera.zoom -= 0.02;
 		}
+
+//		if (Gdx.input.isKeyPressed(Keys.A)) camera.rotate(20 * Gdx.graphics.getDeltaTime(), 0, 1, 0);
+//        if (Gdx.input.isKeyPressed(Keys.D)) camera.rotate(-20 * Gdx.graphics.getDeltaTime(), 0, 1, 0);
+		
 		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 			// if (camera.position.x > 0)
 			camera.translate(-3, 0, 0);

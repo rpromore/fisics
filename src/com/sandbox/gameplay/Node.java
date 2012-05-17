@@ -1,11 +1,13 @@
 package com.sandbox.gameplay;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
+import java.math.BigDecimal;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 
 public interface Node {
+	public AABB bounds = null;
 	public Neighborhood neighborhood();
 	public void neighborhood(Neighborhood n);
 	public Vector3 position();
@@ -21,12 +23,18 @@ public interface Node {
 	public float getX();
 	public float getY();
 	public float getZ();
-	public float radius();
-	public void radius(float r);
-	public BigInteger mass();
-	public void mass(BigInteger m);
+	
+	public BigDecimal radius();
+	public void radius(BigDecimal r);
+	
+	public float restitution();
+	public void restitution(float r);
+	public BigDecimal mass();
+	public void mass(BigDecimal m);
 	public void maxVelocity(int n);
 	public float maxVelocity();
 	public void move();
-	public void draw(OrthographicCamera camera);
+	public void draw(Camera camera);
+	
+	public String bounds();
 }

@@ -1,40 +1,52 @@
 package com.sandbox.gameplay;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import utils.BigSquareRoot;
+
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 
 public class Particle implements Node {
 	private Vector3 position, velocity, target, acceleration;
-	private float width, height, radius, gravity, maxVelocity, maxAcceleration, volume, density;
-	private BigInteger mass;
+	private float gravity, maxVelocity, maxAcceleration, volume, density, restitution;
+	private BigDecimal mass, width, height, radius;
+	// double width, height, radius;
 	Neighborhood neighborhood;
+	
+	protected ArrayList<Node> vertices;
+	protected ShapeRenderer sr = new ShapeRenderer();
+	protected AABB bounds = new AABB();
+	
+	private static BigSquareRoot bgs = new BigSquareRoot();
 
 	// CONSTRUCTORS
 
 	public Particle(float x, float y) {
-		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 100, 100, 50, new BigInteger("1"),
+		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("50"), 1, new BigDecimal("1"),
 				null, 100, .1f);
 	}
-	public Particle(float x, float y, float width, float height) {
-		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), width, height, (float) Math.sqrt(Math.pow(width, 2)+Math.pow(height,  2))*.5f, new BigInteger("1"), null, 100, .1f);
+	public Particle(float x, float y, BigDecimal width, BigDecimal height) {
+		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), width, height, bgs.get(width.pow(2).add(height.pow(2)).divide(new BigDecimal("2"))) /*(float) Math.sqrt(Math.pow(width, 2)+Math.pow(height,  2))*.5f*/, 1, new BigDecimal("1"), null, 100, .1f);
+	}
+	public Particle(int x, int y, BigDecimal width, BigDecimal height) {
+		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), width, height, bgs.get(width.pow(2).add(height.pow(2)).divide(new BigDecimal("2"))), 1, new BigDecimal("1"), null, 100, .1f);
 	}
 	public Particle(float x, float y, Neighborhood neighborhood) {
-		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), 100, 100, 50, new BigInteger("1"),
+		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), new BigDecimal("100"), new BigDecimal("100"), new BigDecimal("50"), 1, new BigDecimal("1"),
 				neighborhood, 100, .1f);
 	}
 	
-	public Particle(float x, float y, float width, float height, Neighborhood neighborhood) {
-		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), width, height, (float) Math.sqrt(Math.pow(width, 2)+Math.pow(height,  2))*.5f, new BigInteger("1"),
+	public Particle(float x, float y, BigDecimal width, BigDecimal height, Neighborhood neighborhood) {
+		this(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), width, height, bgs.get(width.pow(2).add(height.pow(2)).divide(new BigDecimal("2"))), 1, new BigDecimal("1"),
 				neighborhood, 100, .1f);
 	}
 
 	public Particle(Vector3 position, Vector3 velocity, Vector3 acceleration,
-			float width, float height, float radius, BigInteger mass,
+			BigDecimal width, BigDecimal height, BigDecimal radius, float restitution, BigDecimal mass,
 			Neighborhood neighborhood, float maxVelocity, float maxAcceleration) {
 		this.position = new Vector3(position);
 		this.velocity = new Vector3(velocity);
@@ -42,16 +54,25 @@ public class Particle implements Node {
 		this.width = width;
 		this.height = height;
 		this.radius = radius;
+		this.restitution(restitution);
 		this.mass = mass;
-		this.volume = (float) ((4/3) * Math.PI * Math.pow(radius, 3));
+		this.volume = (float) (radius.pow(3).floatValue() * Math.PI * (4/3));/*(float) ((4/3) * Math.PI * Math.pow(radius, 3))*/;
 		this.density = mass.floatValue()/volume;
 		this.neighborhood = neighborhood;
 		this.target = new Vector3(0, 0, 0);
 		this.maxVelocity = maxVelocity;
 		this.maxAcceleration = maxAcceleration;
+		this.vertices = new ArrayList<Node>();
+		bounds = new AABB();
+		vertices.add(this);
+		updateBounds();
 	}
 
 	// GETTERS AND SETTERS
+	
+	public String bounds() {
+		return bounds.toString();
+	}
 
 	@Override
 	public Vector3 position() {
@@ -116,22 +137,32 @@ public class Particle implements Node {
 	}
 
 	@Override
-	public float radius() {
+	public BigDecimal radius() {
 		return radius;
 	}
 
 	@Override
-	public void radius(float r) {
+	public void radius(BigDecimal r) {
 		radius = r;
+	}
+	
+	@Override
+	public float restitution() {
+		return restitution;
+	}
+	
+	@Override
+	public void restitution(float r) {
+		restitution = r;
 	}
 
 	@Override
-	public BigInteger mass() {
+	public BigDecimal mass() {
 		return mass;
 	}
 
 	@Override
-	public void mass(BigInteger m) {
+	public void mass(BigDecimal m) {
 		mass = m;
 	}
 	
@@ -190,15 +221,23 @@ public class Particle implements Node {
 
 	// REST
 
-	public boolean intersects(Particle other) {
-		final double a = radius + other.radius;
-		final double dx = getX() - other.getX();
-		final double dy = getY() - other.getY();
+	public boolean intersects(Node n) {
+		final double a = radius.add(n.radius()).doubleValue();
+		final double dx = getX() - n.getX();
+		final double dy = getY() - n.getY();
+		
+		return a * a > (dx * dx + dy * dy);
+	}
+	
+	public boolean intersects(Particle n) {
+		final double a = radius.add(n.radius()).doubleValue();
+		final double dx = getX() - n.getX();
+		final double dy = getY() - n.getY();
 		
 		return a * a > (dx * dx + dy * dy);
 	}
 
-	public boolean collidesWith(Particle n) {
+	public boolean collidesWith(Node n) {
 		if (n != null && !equals(n)) {
 			return intersects(n);
 		}
@@ -210,7 +249,7 @@ public class Particle implements Node {
 			ArrayList<Particle> collidingWith = new ArrayList<Particle>();
 			for (Node n : neighborhood.getNeighbors()) {
 				Particle p = (Particle) n;
-				if (collidesWith(p)) {
+				if (collidesWith(n)) {
 					collidingWith.add(p);
 				}
 			}
@@ -229,15 +268,15 @@ public class Particle implements Node {
 			// http://stackoverflow.com/questions/345838/ball-to-ball-collision-detection-and-handling
 			Vector3 delta = position().cpy().sub(n.position());
 			float d = delta.len();
-			if (d > radius() + n.radius()) // just kidding
+			if (d > radius.add(n.radius()).doubleValue() ) // just kidding
 				continue;
 			Vector3 mtd;
 			if (d != 0f)
-				mtd = delta.cpy().mul((radius() + n.radius() - d) / d);
+				mtd = delta.cpy().mul((float) ((radius.add(n.radius()).doubleValue() - d) / d));
 			else {
-				d = n.radius + radius - 1.0f;
-				delta = new Vector3(n.radius + radius(), 0, 0);
-				mtd = delta.mul(((radius() + n.radius) - d) / d);
+				d = (float) (radius.add(n.radius()).doubleValue() - 1.0f);
+				delta = new Vector3((float) (radius.add(n.radius()).doubleValue()), 0, 0);
+				mtd = delta.mul((float) (((radius.add(n.radius()).doubleValue()) - d) / d));
 			}
 
 			float im1 = 1 / mass.floatValue();
@@ -255,9 +294,9 @@ public class Particle implements Node {
 				return;
 
 			// collision impulse
-			float i = (-(1.0f + 0.085f) * vn) / (im1 + im2);
+			float i = (-(1.0f + restitution()) * vn) / (im1 + im2);
 			Vector3 impulse = mtd.mul(i);
-
+			
 			// change in momentum
 			velocity.add(impulse.mul(im1));
 			n.velocity.sub(impulse.mul(im2));
@@ -266,7 +305,6 @@ public class Particle implements Node {
 	
 	public void gravity() {
 		if( neighborhood != null ) {
-			acceleration.mul(0);
 			float g = (float) (6.674*Math.pow(10, -11));
 			for( Node n : neighborhood.getNeighbors() ) {
 				Particle p = (Particle) n;
@@ -278,6 +316,7 @@ public class Particle implements Node {
 					float f = (float) (g*m)/d;
 					po.mul(f);
 					po.div(mass.floatValue());
+					System.out.println(po);
 					acceleration.add(po);
 				}
 			}
@@ -286,20 +325,50 @@ public class Particle implements Node {
 
 	@Override
 	public void move() {
-		colliding();
-		gravity();
 		velocity.add(acceleration);
 		position.add(velocity);
 	}
 	
+	public void update() {
+		acceleration.mul(0);
+		colliding();
+		gravity();
+		move();
+		updateBounds();
+	}
+
+	public void updateBounds() {
+		Vector3 min = vertices.get(0).position().cpy();
+		Vector3 max = vertices.get(vertices.size()-1).position().cpy();
+		
+		for( Node n : vertices ) {
+			if( n.position().x < min.x )
+				min.x = n.position().x;
+			if( n.position().y < min.y )
+				min.y = n.position().y;
+			if( n.position().z < min.z )
+				min.z = n.position().z;
+			
+			if( n.position().x > max.x )
+				max.x = n.position().x;
+			if( n.position().y > max.y )
+				max.y = n.position().y;
+			if( n.position().z > max.z )
+				max.z = n.position().z;
+		}
+		
+		bounds.lower(min);
+		bounds.upper(max);
+	}
+	
 	@Override
-	public void draw(OrthographicCamera camera) {
-		ShapeRenderer sr = new ShapeRenderer();
+	public void draw(Camera camera) {
+		update();
 		camera.update();
 		sr.setProjectionMatrix(camera.combined);
 		sr.begin(ShapeType.FilledCircle);
 		sr.setColor(1, 0, 0, 1);
-		sr.filledCircle(getX(), getY(), radius());
+		sr.filledCircle(getX(), getY(), radius.floatValue());
 		sr.end();
 	}
 }

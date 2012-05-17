@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -23,6 +24,7 @@ public abstract class AbstractScreen implements Screen {
 	
 	protected static final int VIRTUAL_WIDTH = 800;
 	protected static final int VIRTUAL_HEIGHT = 600;
+	protected static final int VIRTUAL_DEPTH = 62;
 	private static final float ASPECT_RATIO = (float)VIRTUAL_WIDTH/(float)VIRTUAL_HEIGHT;
 	private Rectangle viewport;
 	

@@ -4,90 +4,17 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 
-public class Shape extends Particle implements Neighborhood {
-	private ArrayList<Node> vertices;
-	private ShapeRenderer sr = new ShapeRenderer();
-	private AABB bounds = new AABB();
-	
+public class Shape extends Particle implements Neighborhood {	
 	public Shape(ArrayList<Node> v) {
 		super(v.get(0).getX(), v.get(0).getY());
 		vertices = v;
 		updateBounds();
 	}
 	
-	public void updateBounds() {
-		Vector3 min = vertices.get(0).position().cpy();
-		Vector3 max = vertices.get(vertices.size()-1).position().cpy();
-		
-		for( Node n : vertices ) {
-			if( n.position().x < min.x )
-				min.x = n.position().x;
-			if( n.position().y < min.y )
-				min.y = n.position().y;
-			if( n.position().z < min.z )
-				min.z = n.position().z;
-			
-			if( n.position().x > max.x )
-				max.x = n.position().x;
-			if( n.position().y > max.y )
-				max.y = n.position().y;
-			if( n.position().z > max.z )
-				max.z = n.position().z;
-		}
-		
-		bounds.lower(min);
-		bounds.upper(max);
-	}
-	
-	public boolean intersects(Shape other) {
-		// 	using this page for help:
-		// 		http://www.wildbunny.co.uk/blog/2011/04/20/collision-detection-for-dummies/
-		
-		// 	First we do AABB vs AABB collision test since it's easier and faster to calculate 
-		//	than a more complex collision test.
-		if( bounds.intersects(other.bounds) ) {
-			return true;
-		}
-		
-		return false;
-	}
-	
-	public boolean collidesWith(Node n) {
-		Shape s = (Shape) n;
-		if (n != null && !equals(s)) {
-			return intersects(s);
-		}
-		return false;
-	}
-
-	public boolean colliding() {
-		if( neighborhood != null ) {
-			ArrayList<Particle> collidingWith = new ArrayList<Particle>();
-			for (Node n : neighborhood.getNeighbors()) {
-				Particle p = (Particle) n;
-				if (collidesWith(n)) {
-					collidingWith.add(p);
-				}
-			}
-			resolveCollisions(collidingWith);
-	
-			return collidingWith.size() > 0;
-		}
-		return false;
-	}
-	
 	// Mass: 		distribute mass equally among all points, i.e. uniform mass. Ponder this.
-	
-	public void update() {
-		colliding();
-		// gravity();
-		move();
-		updateBounds();
-	}
 	
 	public void draw(OrthographicCamera camera) {
 		update();
@@ -109,7 +36,7 @@ public class Shape extends Particle implements Neighborhood {
 			
 			sr.begin(ShapeType.FilledCircle);
 			sr.setColor(1, 0, 0, 1);
-			sr.filledCircle(cp.getX(), cp.getY(), cp.radius());
+			sr.filledCircle(cp.getX(), cp.getY(), (float) cp.radius());
 			sr.end();
 			
 			sr.begin(ShapeType.Line);
@@ -194,12 +121,12 @@ public class Shape extends Particle implements Neighborhood {
 	}
 
 	@Override
-	public float radius() {
+	public double radius() {
 		return bounds.center().len();
 	}
 
 	@Override
-	public void radius(float r) {
+	public void radius(double r) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -226,5 +153,19 @@ public class Shape extends Particle implements Neighborhood {
 	public float maxVelocity() {
 		// TODO
 		return 0;
+	}
+	
+	@Override
+	public boolean intersects(Node n) {
+		// 	using this page for help:
+		// 		http://www.wildbunny.co.uk/blog/2011/04/20/collision-detection-for-dummies/
+		
+		// 	First we do AABB vs AABB collision test since it's easier and faster to calculate 
+		//	than a more complex collision test.
+		if( bounds.intersects(n.bounds) ) {
+			return true;
+		}
+		
+		return false;
 	}
 }
