@@ -4,7 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL10;
-import com.sandbox.gui.TestScreen;
+import com.sandbox.gui.CullTest;
 
 public class Sandbox extends Game {
 	
@@ -12,7 +12,7 @@ public class Sandbox extends Game {
 	
 	@Override
 	public void create() {
-		setScreen(new TestScreen(this));
+		setScreen(new CullTest(this));
 		fpsLogger = new FPSLogger();
 	}
 

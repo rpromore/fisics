@@ -3,9 +3,9 @@ package com.sandbox.gui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
@@ -34,7 +34,7 @@ public abstract class AbstractScreen implements Screen {
 	
 	protected Stage stage;
 	
-	protected OrthographicCamera camera;
+	protected Camera camera;
 
 	public AbstractScreen(Sandbox game) {
 		this.game = game;

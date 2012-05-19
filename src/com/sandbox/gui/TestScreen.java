@@ -72,29 +72,29 @@ public class TestScreen extends AbstractScreen {
 //		shapes.add(triangle);
 //		shapes.add(line);
 		
-		float r = 0f;
+		float r = 0.1f;
 		
-		Particle ass = new Particle(-100, 0, new BigDecimal("100"), new BigDecimal("100")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
-		ass.mass(new BigDecimal("597360000000"));
+		Particle ass = new Particle(-100, 0, new BigDecimal("200"), new BigDecimal("200")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
+		ass.mass(new BigDecimal("5973600000000"));
 		ass.velocity(new Vector3(0, 0, 0));
 		ass.restitution(r);
 		shapes.add(ass);
 		
-		Particle ass2 = new Particle(0, 0, new BigDecimal("2"), new BigDecimal("2"));
-		ass2.mass(new BigDecimal("1"));
+		Particle ass2 = new Particle(0, 0, new BigDecimal("10"), new BigDecimal("10"));
+		ass2.mass(new BigDecimal("100"));
 		ass2.velocity(new Vector3(0, 0, 0));
 		ass2.restitution(r);
 		shapes.add(ass2);
-//		
-//		Particle ass3 = new Particle(0, 100, 10, 10);
-//		ass3.velocity(new Vector3(0, 0, 0));
-//		ass3.restitution(r);
-//		shapes.add(ass3);
-//		
-//		Particle ass4 = new Particle(0, -100, 10, 10);
-//		ass4.velocity(new Vector3(0, 0, 0));
-//		ass4.restitution(r);
-//		shapes.add(ass4);
+		
+		Particle ass3 = new Particle(0, 100, new BigDecimal("10"), new BigDecimal("10"));
+		ass3.velocity(new Vector3(0, 0, 0));
+		ass3.restitution(r);
+		shapes.add(ass3);
+		
+		Particle ass4 = new Particle(0, -100, new BigDecimal("10"), new BigDecimal("10"));
+		ass4.velocity(new Vector3(0, 0, 0));
+		ass4.restitution(r);
+		shapes.add(ass4);
 		
 	}
 	
