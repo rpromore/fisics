@@ -313,10 +313,9 @@ public class Particle implements Node {
 					Vector3 po = n.position().cpy().sub(position);
 					float d = po.len2();
 					po.nor();
-					float f = (float) (g*m)/d;
+					float f = (float) g*(m/d);
 					po.mul(f);
 					po.div(mass.floatValue());
-					System.out.println(po);
 					acceleration.add(po);
 				}
 			}
@@ -366,9 +365,13 @@ public class Particle implements Node {
 		update();
 		camera.update();
 		sr.setProjectionMatrix(camera.combined);
-		sr.begin(ShapeType.FilledCircle);
+		sr.begin(ShapeType.Circle);
 		sr.setColor(1, 0, 0, 1);
-		sr.filledCircle(getX(), getY(), radius.floatValue());
+		sr.circle(getX(), getY(), radius.floatValue());
+		sr.end();
+		sr.begin(ShapeType.Line);
+		sr.setColor(0, 0, 1, 1);
+		sr.line(getX(), getY(), getX()+velocity.cpy().nor().mul(radius.floatValue()).x, getY()+velocity.cpy().nor().mul(radius.floatValue()).y);
 		sr.end();
 	}
 }

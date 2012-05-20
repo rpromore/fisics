@@ -72,29 +72,29 @@ public class TestScreen extends AbstractScreen {
 //		shapes.add(triangle);
 //		shapes.add(line);
 		
-		float r = 0.1f;
+		float r = 0.0f;
 		
-		Particle ass = new Particle(-100, 0, new BigDecimal("200"), new BigDecimal("200")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
-		ass.mass(new BigDecimal("5973600000000"));
+		Particle ass = new Particle(0, 0, new BigDecimal("127.5632"), new BigDecimal("127.5632")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
+		ass.mass(new BigDecimal("597360000000"));
 		ass.velocity(new Vector3(0, 0, 0));
 		ass.restitution(r);
 		shapes.add(ass);
 		
-		Particle ass2 = new Particle(0, 0, new BigDecimal("10"), new BigDecimal("10"));
+		Particle ass2 = new Particle(200, 0, new BigDecimal("10"), new BigDecimal("10"));
 		ass2.mass(new BigDecimal("100"));
 		ass2.velocity(new Vector3(0, 0, 0));
 		ass2.restitution(r);
 		shapes.add(ass2);
 		
-		Particle ass3 = new Particle(0, 100, new BigDecimal("10"), new BigDecimal("10"));
+		Particle ass3 = new Particle(10, 200, new BigDecimal("10"), new BigDecimal("10"));
 		ass3.velocity(new Vector3(0, 0, 0));
 		ass3.restitution(r);
-		shapes.add(ass3);
+		// shapes.add(ass3);
 		
-		Particle ass4 = new Particle(0, -100, new BigDecimal("10"), new BigDecimal("10"));
+		Particle ass4 = new Particle(10, -200, new BigDecimal("10"), new BigDecimal("10"));
 		ass4.velocity(new Vector3(0, 0, 0));
 		ass4.restitution(r);
-		shapes.add(ass4);
+		// shapes.add(ass4);
 		
 	}
 	
@@ -154,11 +154,11 @@ public class TestScreen extends AbstractScreen {
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			//if (camera.zoom <= 4)
-				camera.zoom += 0.02;
+				((OrthographicCamera)camera).zoom += 0.02;
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-			if (camera.zoom > .0001)
-				camera.zoom -= 0.02;
+			if (((OrthographicCamera)camera).zoom > .0001)
+				((OrthographicCamera)camera).zoom -= 0.02;
 		}
 
 //		if (Gdx.input.isKeyPressed(Keys.A)) camera.rotate(20 * Gdx.graphics.getDeltaTime(), 0, 1, 0);

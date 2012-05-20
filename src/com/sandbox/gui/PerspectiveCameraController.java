@@ -7,12 +7,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.MathUtils;
 
 public class PerspectiveCameraController extends InputAdapter {
-	static final float MOUSE_SENSITIVITY = 0.25f;
-	static final float MOVE_SPEED = 2;
-	static final float MOVE_SPEED_SQRT = (float) Math.sqrt(MOVE_SPEED);
-
-	static final float NINETY_DEGREE = 89.99f; // gimbal lock prevention
-
 	PerspectiveCamera cam;
 	int lastX;
 	int lastY;
@@ -20,6 +14,70 @@ public class PerspectiveCameraController extends InputAdapter {
 	float angleY = 0;
 
 	boolean W, A, S, D;
+	
+	private int forward_key = Keys.W;
+	private int backward_key = Keys.S;
+	private int left_key = Keys.A;
+	private int right_key = Keys.D;
+	private int up_key = Keys.Q;
+	private int down_key = Keys.Z;
+	
+	private boolean inverted = false;
+	
+	private float sensitivity = 0.25f;
+	private float speed = 2;
+	private float speed_sqrt = (float) Math.sqrt(speed);
+
+	static final float NINETY_DEGREE = 89.99f; // gimbal lock prevention
+	
+	public int forward() {
+		return forward_key;
+	}
+	public void forward(int n) {
+		forward_key = n;
+	}
+
+	public int backward() {
+		return backward_key;
+	}
+	public void backward(int n) {
+		backward_key = n;
+	}
+	
+	public int left() {
+		return left_key;
+	}
+	public void left(int n) {
+		left_key = n;
+	}
+	
+	public int right() {
+		return right_key;
+	}
+	public void right(int n) {
+		right_key = n;
+	}
+	
+	public int up() {
+		return up_key;
+	}
+	public void up(int n) {
+		up_key = n;
+	}
+	
+	public int down() {
+		return down_key;
+	}
+	public void dow (int n) {
+		down_key = n;
+	}
+	
+	public boolean inverted() {
+		return inverted;
+	}
+	public void inverted(boolean n) {
+		inverted = n;
+	}
 
 	public PerspectiveCameraController(PerspectiveCamera cam) {
 		this.cam = cam;
@@ -42,20 +100,15 @@ public class PerspectiveCameraController extends InputAdapter {
 		// make sure cursor is confined to window
 		Gdx.input.setCursorCatched(true);
 
-		// NOTE: to invert use (lastX - x) and (lastY - y)
-		angleX += (x - lastX) * MOUSE_SENSITIVITY;
+		angleX += inverted ? (lastX - x) * sensitivity : (x - lastX) * sensitivity;
 		lastX = x;
-		angleY += (y - lastY) * -MOUSE_SENSITIVITY;
+		angleY += inverted ? (y - lastY) * -sensitivity : (lastY - y) * sensitivity;
 		lastY = y;
 
 		if (angleY > NINETY_DEGREE)
 			angleY = NINETY_DEGREE;
 		else if (angleY < -NINETY_DEGREE)
 			angleY = -NINETY_DEGREE;
-		
-		System.out.println(angleX);
-		System.out.println(angleY);
-		
 
 		// first rotate around y axel
 		// then rotate up/down, and
@@ -64,6 +117,7 @@ public class PerspectiveCameraController extends InputAdapter {
 		cam.direction.y = MathUtils.sinDeg(angleY) * 1f;
 		cam.direction.z = MathUtils.sinDeg(angleX) * cos;
 		cam.update();
+		
 		return true;
 	}
 
@@ -77,13 +131,13 @@ public class PerspectiveCameraController extends InputAdapter {
 	@Override
 	public boolean keyDown(int keycode) {
 
-		if (keycode == Keys.A)
+		if (keycode == left_key)
 			A = true;
-		else if (keycode == Keys.D)
+		else if (keycode == right_key)
 			D = true;
-		else if (keycode == Keys.S)
+		else if (keycode == backward_key)
 			S = true;
-		else if (keycode == Keys.W)
+		else if (keycode == forward_key)
 			W = true;
 
 		return false;
@@ -91,13 +145,13 @@ public class PerspectiveCameraController extends InputAdapter {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		if (keycode == Keys.A)
+		if (keycode == left_key)
 			A = false;
-		else if (keycode == Keys.D)
+		else if (keycode == right_key)
 			D = false;
-		else if (keycode == Keys.S)
+		else if (keycode == backward_key)
 			S = false;
-		else if (keycode == Keys.W)
+		else if (keycode == forward_key)
 			W = false;
 
 		return false;
@@ -111,10 +165,10 @@ public class PerspectiveCameraController extends InputAdapter {
 
 		// is moving diagonal move speed is sqrt of normal
 		if ((A ^ D) & (W ^ S))
-			delta *= MOVE_SPEED_SQRT;
+			delta *= speed_sqrt;
 		else {
 			// if moving one direction move speed is full
-			delta *= MOVE_SPEED;
+			delta *= speed;
 		}
 
 		if (A & !D) {

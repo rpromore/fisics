@@ -5,8 +5,6 @@ import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -54,8 +52,6 @@ public class CullTest extends AbstractScreen {
 		multiplexer.addProcessor(controller);
 		Gdx.input.setInputProcessor(multiplexer);
 	}
-	
-	private static final int MAX_VERTICES = 10000 * 3;
 
 	@Override
 	public void render(float d) {
