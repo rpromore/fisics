@@ -1,7 +1,6 @@
 package com.sandbox.gui;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -11,19 +10,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.sandbox.Sandbox;
 import com.sandbox.gameplay.Node;
 import com.sandbox.gameplay.Nodes;
-import com.sandbox.gameplay.Particle;
-import com.sandbox.gameplay.Shape;
+import com.sandbox.gameplay.node2D.Circle;
 
 public class TestScreen extends AbstractScreen {
 	Nodes shapes;
-	
-	Nodes rect;
-	Nodes tri;
-	Nodes lin;
-	
-	Shape rectangle;
-	Shape triangle;
-	Shape line;
 	
 	Vector3 _touchPoint = new Vector3();
 
@@ -39,59 +29,26 @@ public class TestScreen extends AbstractScreen {
 		camera.update(true);
 		
 		shapes = new Nodes();
-//		shapes.add(new Particle(0, 0, 5, 5));
-//		Particle p = new Particle(30, 0, 10, 10);
-//		p.velocity(new Vector3(-.1f, 0, 0));
-//		shapes.add(p);
+		float r = .2f;
 		
-		/*rect = new Nodes();
-		rect.add(new Particle(0, 0, 5, 5));
-		rect.add(new Particle(100, 0, 5, 5));
-		rect.add(new Particle(100, -100, 5, 5));
-		rect.add(new Particle(0, -100, 5, 5));
-		
-		rectangle = new Shape(rect.getNeighbors());
-		rectangle.mass(new BigInteger("100000"));
-		
-		tri = new Nodes();
-		tri.add(new Particle(50, 200, 5, 5));
-		tri.add(new Particle(0, 100, 5, 5));
-		tri.add(new Particle(100, 100, 5, 5));
-		
-		triangle = new Shape(tri.getNeighbors());
-		triangle.velocity(new Vector3(0, -1, 0));*/
-		
-//		lin = new Nodes();
-//		lin.add(new Particle(0, 0, 5, 5));
-//		lin.add(new Particle(0, 100, 5, 5));
-		
-//		line = new Shape(lin.getNeighbors());
-//		line.velocity(new Vector3(0, -.1f, 0));
-		
-//		shapes.add(rectangle);
-//		shapes.add(triangle);
-//		shapes.add(line);
-		
-		float r = .1f;
-		
-		Particle ass = new Particle(0, 0, new BigDecimal("127.5632"), new BigDecimal("127.5632")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
-		ass.mass(new BigDecimal("5973600000000"));
+		Circle ass = new Circle(0, 0, new BigDecimal("127.5632"), new BigDecimal("127.5632")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
+		ass.mass(new BigDecimal("597360000000000"));
 		ass.velocity(new Vector3(0, 0, 0));
 		ass.restitution(r);
 		shapes.add(ass);
 		
-		Particle ass2 = new Particle(200, 0, new BigDecimal("10"), new BigDecimal("10"));
+		Circle ass2 = new Circle(200, 0, new BigDecimal("10"), new BigDecimal("10"));
 		ass2.mass(new BigDecimal("100"));
 		ass2.velocity(new Vector3(0, 0, 0));
 		ass2.restitution(r);
 		shapes.add(ass2);
 		
-		Particle ass3 = new Particle(0, 200, new BigDecimal("10"), new BigDecimal("10"));
+		Circle ass3 = new Circle(0, 200, new BigDecimal("10"), new BigDecimal("10"));
 		ass3.velocity(new Vector3(0, 0, 0));
 		ass3.restitution(r);
 		shapes.add(ass3);
 		
-		Particle ass4 = new Particle(0, -200, new BigDecimal("10"), new BigDecimal("10"));
+		Circle ass4 = new Circle(0, -200, new BigDecimal("10"), new BigDecimal("10"));
 		ass4.velocity(new Vector3(0, 0, 0));
 		ass4.restitution(r);
 		shapes.add(ass4);
