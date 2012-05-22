@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 
 public class Particle implements Node {
 	private Vector3 position, velocity, target, acceleration;
-	private float gravity, maxVelocity, maxAcceleration, volume, density, restitution;
+	private float maxVelocity, maxAcceleration, volume, density, restitution;
 	private BigDecimal mass, width, height, radius;
 	// double width, height, radius;
 	Neighborhood neighborhood;
@@ -230,16 +230,24 @@ public class Particle implements Node {
 	}
 	
 	public boolean intersects(Particle n) {
-		final double a = radius.add(n.radius()).doubleValue();
+		final double a = radius.add(n.radius()).floatValue();
 		final double dx = getX() - n.getX();
 		final double dy = getY() - n.getY();
+		
+		return a * a > (dx * dx + dy * dy);
+	}
+	
+	public boolean willIntersect(Node n) {
+		final double a = radius.add(n.radius()).floatValue();
+		final double dx = getX() + velocity.x - n.getX();
+		final double dy = getY() + velocity.y - n.getY();
 		
 		return a * a > (dx * dx + dy * dy);
 	}
 
 	public boolean collidesWith(Node n) {
 		if (n != null && !equals(n)) {
-			return intersects(n);
+			return intersects(n) || willIntersect(n);
 		}
 		return false;
 	}
@@ -268,8 +276,7 @@ public class Particle implements Node {
 			// http://stackoverflow.com/questions/345838/ball-to-ball-collision-detection-and-handling
 			Vector3 delta = position().cpy().sub(n.position());
 			float d = delta.len();
-			if (d > radius.add(n.radius()).doubleValue() ) // just kidding
-				continue;
+			
 			Vector3 mtd;
 			if (d != 0f)
 				mtd = delta.cpy().mul((float) ((radius.add(n.radius()).doubleValue() - d) / d));
@@ -287,14 +294,12 @@ public class Particle implements Node {
 
 			// impact speed
 			Vector3 v = velocity.cpy().sub(n.velocity);
-			float vn = v.dot(mtd.nor());
-
-			// sphere intersecting but moving away from each other already
-			if (vn > 0.0f)
-				return;
+			float vn = v.cpy().dot(mtd.nor());
 
 			// collision impulse
-			float i = (-(1.0f + restitution()) * vn) / (im1 + im2);
+			System.out.println(im1);
+			
+			float i = (-(1.0f + restitution) * vn) / (im1 + im2);
 			Vector3 impulse = mtd.mul(i);
 			
 			// change in momentum
@@ -309,13 +314,21 @@ public class Particle implements Node {
 			for( Node n : neighborhood.getNeighbors() ) {
 				Particle p = (Particle) n;
 				if( !equals(p) ) {
-					float m = p.mass.floatValue()*mass.floatValue();
+//					float m = p.mass.floatValue()*mass.floatValue();
+//					Vector3 po = n.position().cpy().sub(position);
+//					float d = po.len2();
+//					po.nor();
+//					float f = (float) g*(m/d);
+//					po.mul(f);
+//					po.div(mass.floatValue());
+					
+					float m = p.mass.floatValue();
 					Vector3 po = n.position().cpy().sub(position);
 					float d = po.len2();
 					po.nor();
 					float f = (float) g*(m/d);
 					po.mul(f);
-					po.div(mass.floatValue());
+
 					acceleration.add(po);
 				}
 			}
@@ -330,9 +343,9 @@ public class Particle implements Node {
 	
 	public void update() {
 		acceleration.mul(0);
-		colliding();
 		gravity();
 		move();
+		colliding();
 		updateBounds();
 	}
 
