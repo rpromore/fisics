@@ -3,17 +3,14 @@ package com.sandbox.gameplay;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import utils.BigSquareRoot;
-
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 
 public class Node {
 	protected Vector3 position, velocity, target, acceleration, friction;
 	protected float maxVelocity, maxAcceleration, volume, density, restitution;
-	protected BigDecimal mass, width, height, radius;
+	protected BigDecimal mass, width, height;
 	// double width, height, radius;
 	Neighborhood neighborhood;
 	
@@ -24,17 +21,16 @@ public class Node {
 	// CONSTRUCTORS
 
 	public Node(Vector3 position, Vector3 velocity, Vector3 acceleration,
-			BigDecimal width, BigDecimal height, BigDecimal radius, float restitution, BigDecimal mass,
+			BigDecimal width, BigDecimal height, float restitution, BigDecimal mass,
 			Neighborhood neighborhood, float maxVelocity, float maxAcceleration) {
 		this.position = new Vector3(position);
 		this.velocity = new Vector3(velocity);
 		this.acceleration = new Vector3(acceleration);
 		this.width = width;
 		this.height = height;
-		this.radius = radius;
 		this.restitution(restitution);
 		this.mass = mass;
-		this.volume = (float) (radius.pow(3).floatValue() * Math.PI * (4/3));/*(float) ((4/3) * Math.PI * Math.pow(radius, 3))*/;
+//		this.volume = (float) (radius.pow(3).floatValue() * Math.PI * (4/3));/*(float) ((4/3) * Math.PI * Math.pow(radius, 3))*/;
 		this.density = mass.floatValue()/volume;
 		this.neighborhood = neighborhood;
 		this.target = new Vector3(0, 0, 0);
@@ -50,8 +46,8 @@ public class Node {
 
 	// GETTERS AND SETTERS
 	
-	public String bounds() {
-		return bounds.toString();
+	public AABB bounds() {
+		return bounds;
 	}
 
 	public Vector3 position() {
@@ -104,14 +100,12 @@ public class Node {
 		return position.z;
 	}
 
-	
-	public BigDecimal radius() {
-		return radius;
+	public BigDecimal width() {
+		return width;
 	}
 
-	
-	public void radius(BigDecimal r) {
-		radius = r;
+	public BigDecimal height() {
+		return height;
 	}
 	
 	
@@ -151,11 +145,7 @@ public class Node {
 	// REST
 
 	public boolean intersects(Node n) {
-		final double a = radius.add(n.radius()).doubleValue();
-		final double dx = getX() - n.getX();
-		final double dy = getY() - n.getY();
-		
-		return a * a > (dx * dx + dy * dy);
+		return bounds.intersects(n.bounds);
 	}
 
 	public boolean collidesWith(Node n) {
@@ -174,7 +164,8 @@ public class Node {
 					collidingWith.add(p);
 				}
 			}
-			resolveCollisions(collidingWith);
+			if( collidingWith.size() > 0 ) 	
+				resolveCollisions(collidingWith);
 	
 			return collidingWith.size() > 0;
 		}
@@ -182,44 +173,7 @@ public class Node {
 	}
 
 	public void resolveCollisions(ArrayList<Node> nodes) {
-		for (Node n : nodes) {
-			if (n.equals(this))
-				continue;
-
-			// http://stackoverflow.com/questions/345838/ball-to-ball-collision-detection-and-handling
-			Vector3 delta = position().cpy().sub(n.position());
-			float d = delta.len();
-			
-			Vector3 mtd;
-			if (d != 0f)
-				mtd = delta.cpy().mul((float) ((radius.add(n.radius()).doubleValue() - d) / d));
-			else {
-				d = (float) (radius.add(n.radius()).doubleValue() - 1.0f);
-				delta = new Vector3((float) (radius.add(n.radius()).doubleValue()), 0, 0);
-				mtd = delta.mul((float) (((radius.add(n.radius()).doubleValue()) - d) / d));
-			}
-
-			float im1 = 1 / mass.floatValue();
-			float im2 = 1 / n.mass.floatValue();
-
-			position().add(mtd.cpy().mul(im1 / (im1 + im2)));
-			n.position().sub(mtd.cpy().mul(im2 / (im1 + im2)));
-
-			// impact speed
-			Vector3 v = velocity.cpy().sub(n.velocity);
-			float vn = v.cpy().dot(mtd.nor());
-
-			// collision impulse			
-			float i = (-(1.0f + restitution) * vn) / (im1 + im2);
-			Vector3 impulse = mtd.mul(i);
-			
-			// change in momentum
-			velocity.add(impulse.mul(im1));
-			n.velocity.sub(impulse.mul(im2));
-			
-			// Friction
-			friction.add(velocity.cpy().mul(.25f));
-		}
+		
 	}
 	
 	public void gravity() {
