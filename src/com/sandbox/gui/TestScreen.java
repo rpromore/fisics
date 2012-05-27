@@ -123,7 +123,7 @@ public class TestScreen extends AbstractScreen {
 			camera.unproject(_touchPoint.set(Gdx.input.getX(),
 					Gdx.input.getY(), 0));
 			shapes.get(1).position(_touchPoint);	
-			shapes.get(1).velocity(new Vector3(0, -1, 0));
+			shapes.get(1).velocity(new Vector3(0, -5, 0));
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {

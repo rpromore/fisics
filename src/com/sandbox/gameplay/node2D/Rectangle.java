@@ -30,6 +30,11 @@ public class Rectangle extends Node {
 	}
 	
 	@Override
+	public Vector3 position() {
+		return position.cpy().add(width.floatValue()).div(2);
+	}
+	
+	@Override
 	public void draw(Camera camera) {
 		update();
 		camera.update();
@@ -44,11 +49,6 @@ public class Rectangle extends Node {
 		sr.point(bounds.lower().x, bounds.lower().y, bounds.lower().z);
 		sr.setColor(0, 1, 1, 1);
 		sr.point(bounds.upper().x, bounds.upper().y, bounds.upper().z);
-		sr.end();
-		
-		sr.begin(ShapeType.FilledCircle);
-		sr.setColor(1, 0, 1, 1);
-		sr.filledCircle(position.x, position.y, 5);
 		sr.end();
 	}
 	
@@ -69,7 +69,23 @@ public class Rectangle extends Node {
 	
 	@Override
 	public void gravity() {
-		
+		if( neighborhood != null ) {
+			float g = (float) (6.674*Math.pow(10, -11));
+			for( Node n : neighborhood.getNeighbors() ) {
+				Node p = (Node) n;
+				if( !equals(p) ) {
+					
+					float m = p.mass().floatValue();
+					Vector3 po = n.position().cpy().sub(position);
+					float d = po.len2();
+					po.nor();
+					float f = (float) g*(m/d);
+					po.mul(f);
+
+					acceleration.add(po);
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -84,10 +100,7 @@ public class Rectangle extends Node {
 			float im2 = 1 / m.mass().floatValue();
 
 			position.add(mtd.cpy().mul(im1 / (im1 + im2)));
-//			if( collidesWith(neighborhood.getNeighbors().get(0) ) ) {
-//				n.position.sub(mtd.cpy().mul(im2 / (im1 + im2)));
-//			}
-//			n.position().sub(mtd.cpy().mul(im2 / (im1 + im2)));
+			m.position().sub(mtd.cpy().mul(im2 / (im1 + im2)));
 
 			// impact speed
 			Vector3 v = velocity.cpy().sub(m.velocity());
@@ -99,10 +112,10 @@ public class Rectangle extends Node {
 			
 			// change in momentum
 			velocity.add(impulse.mul(im1));
-//			n.velocity.sub(impulse.mul(im2));
+			m.velocity().sub(impulse.mul(im2));
 			
 			// Friction
-			friction.add(velocity);
+			friction.add(velocity.cpy().mul(.085f));
 			
 		}
 	}

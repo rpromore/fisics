@@ -8,17 +8,27 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 
 public class Node {
-	protected Vector3 position, velocity, target, acceleration, friction;
+	protected Vector3 position;
+	protected Vector3 velocity;
+	protected Vector3 target;
+	protected Vector3 acceleration;
+	protected Vector3 friction;
 	protected float maxVelocity, maxAcceleration, volume, density, restitution;
-	protected BigDecimal mass, width, height;
+	protected BigDecimal mass;
+	protected BigDecimal width;
+	protected BigDecimal height;
 	// double width, height, radius;
-	Neighborhood neighborhood;
+	protected Neighborhood neighborhood;
 	
 	protected ArrayList<Node> vertices;
 	protected ShapeRenderer sr = new ShapeRenderer();
 	protected AABB bounds = new AABB();
 
 	// CONSTRUCTORS
+	
+	public Node(Node n) {
+		this(n.position, n.velocity, n.acceleration, n.width, n.height, n.restitution, n.mass, n.neighborhood, n.maxVelocity, n.maxAcceleration);
+	}
 
 	public Node(Vector3 position, Vector3 velocity, Vector3 acceleration,
 			BigDecimal width, BigDecimal height, float restitution, BigDecimal mass,
@@ -147,10 +157,23 @@ public class Node {
 	public boolean intersects(Node n) {
 		return bounds.intersects(n.bounds);
 	}
+	
+	public boolean willIntersect(Node n) {
+		Node m = new Node(this);
+		m.position.add(m.velocity);
+		return m.bounds.intersects(n.bounds);
+	}
 
 	public boolean collidesWith(Node n) {
 		if (n != null && !equals(n)) {
 			return intersects(n);
+		}
+		return false;
+	}
+	
+	public boolean willCollideWith(Node n) {
+		if (n != null && !equals(n)) {
+			return willIntersect(n);
 		}
 		return false;
 	}
@@ -163,6 +186,9 @@ public class Node {
 				if (collidesWith(n)) {
 					collidingWith.add(p);
 				}
+//				else if( willCollideWith(n) ) {
+//					velocity.mul(0);
+//				}
 			}
 			if( collidingWith.size() > 0 ) 	
 				resolveCollisions(collidingWith);
@@ -182,20 +208,20 @@ public class Node {
 			for( Node n : neighborhood.getNeighbors() ) {
 				Node p = (Node) n;
 				if( !equals(p) ) {
-					float m = p.mass.floatValue()*mass.floatValue();
-					Vector3 po = n.position().cpy().sub(position);
-					float d = po.len2();
-					po.nor();
-					float f = (float) g*(m/d);
-					po.mul(f);
-					po.div(mass.floatValue());
-					
-//					float m = p.mass.floatValue();
+//					float m = p.mass.floatValue()*mass.floatValue();
 //					Vector3 po = n.position().cpy().sub(position);
 //					float d = po.len2();
 //					po.nor();
 //					float f = (float) g*(m/d);
 //					po.mul(f);
+//					po.div(mass.floatValue());
+					
+					float m = p.mass.floatValue();
+					Vector3 po = n.position.cpy().sub(position);
+					float d = po.len2();
+					po.nor();
+					float f = (float) g*(m/d);
+					po.mul(f);
 
 					acceleration.add(po);
 				}
@@ -218,23 +244,23 @@ public class Node {
 	}
 
 	public void updateBounds() {
-		Vector3 min = vertices.get(0).position().cpy();
-		Vector3 max = vertices.get(vertices.size()-1).position().cpy();
+		Vector3 min = vertices.get(0).position.cpy();
+		Vector3 max = vertices.get(vertices.size()-1).position.cpy();
 		
 		for( Node n : vertices ) {
-			if( n.position().x < min.x )
-				min.x = n.position().x;
-			if( n.position().y < min.y )
-				min.y = n.position().y;
-			if( n.position().z < min.z )
-				min.z = n.position().z;
+			if( n.position.x < min.x )
+				min.x = n.position.x;
+			if( n.position.y < min.y )
+				min.y = n.position.y;
+			if( n.position.z < min.z )
+				min.z = n.position.z;
 			
-			if( n.position().x > max.x )
-				max.x = n.position().x;
-			if( n.position().y > max.y )
-				max.y = n.position().y;
-			if( n.position().z > max.z )
-				max.z = n.position().z;
+			if( n.position.x > max.x )
+				max.x = n.position.x;
+			if( n.position.y > max.y )
+				max.y = n.position.y;
+			if( n.position.z > max.z )
+				max.z = n.position.z;
 		}
 		
 		bounds.lower(min);
