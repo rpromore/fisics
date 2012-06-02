@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.sandbox.Sandbox;
+import com.sandbox.gameplay.BasicNode;
 import com.sandbox.gameplay.Node;
 import com.sandbox.gameplay.Nodes;
 import com.sandbox.gameplay.node2D.Circle;
@@ -31,15 +32,15 @@ public class TestScreen extends AbstractScreen {
 		camera.update(true);
 		
 		shapes = new Nodes();
-		float r = 0f;
+		float r = 1f;
 		
-		Rectangle ass = new Rectangle(0, 0, new BigDecimal("127.5632"), new BigDecimal("127.5632")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
+		Circle ass = new Circle(0, 0, new BigDecimal("127.5632"), new BigDecimal("127.5632")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
 		ass.mass(new BigDecimal("59736000000000"));
 		ass.velocity(new Vector3(0, 0, 0));
 		ass.restitution(r);
 		shapes.add(ass);
 		
-		Rectangle ass2 = new Rectangle(200, 0, new BigDecimal("10"), new BigDecimal("10"));
+		Circle ass2 = new Circle(200, 0, new BigDecimal("10"), new BigDecimal("10"));
 		ass2.mass(new BigDecimal("100"));
 		ass2.velocity(new Vector3(-3, 0, 0));
 		ass2.restitution(r);
@@ -60,7 +61,7 @@ public class TestScreen extends AbstractScreen {
 		int max = 200;
 		int min = -200;
 		
-//		for( int i = 0; i < 100; i++ ) {
+//		for( int i = 0; i < 10; i++ ) {
 //			float x = gen.nextInt(max - min + 1) + min;
 //			float y = gen.nextInt(max - min + 1) + min;
 //			Circle a = new Circle(x, y, new BigDecimal("10"), new BigDecimal("10"));
@@ -100,6 +101,9 @@ public class TestScreen extends AbstractScreen {
 //		triangle.draw(camera);
 		
 		for( Node n : shapes.getNeighbors() ) {
+			((BasicNode)n).colliding();
+		}
+		for( Node n : shapes.getNeighbors() ) {
 			n.draw(camera);
 		}
 		
@@ -123,7 +127,7 @@ public class TestScreen extends AbstractScreen {
 			camera.unproject(_touchPoint.set(Gdx.input.getX(),
 					Gdx.input.getY(), 0));
 			shapes.get(1).position(_touchPoint);	
-			shapes.get(1).velocity(new Vector3(0, -5, 0));
+			shapes.get(1).velocity(new Vector3(0, 0, 0));
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
