@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.sandbox.gameplay.BasicNode;
 import com.sandbox.gameplay.Neighborhood;
 import com.sandbox.gameplay.Node;
-import com.sandbox.gameplay.bounds.AABB;
+import com.sandbox.gameplay.bounds.BoundingBox;
 
 public class Rectangle extends BasicNode implements Node {
 	public Rectangle(float x, float y) {
@@ -26,7 +26,14 @@ public class Rectangle extends BasicNode implements Node {
 	public Rectangle(float x, float y, BigDecimal width, BigDecimal height, Neighborhood neighborhood) {
 		super(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(0, 0, 0), width, height, 1, new BigDecimal("1"),
 				neighborhood, 100, .1f);
-		this.bounds = new AABB(this);
+		this.bounds = new BoundingBox(this);
+	}
+	
+	@Override
+	public void position(Vector3 p) {
+		p.x -= width.floatValue()/2;
+		p.y -= height.floatValue()/2;
+		super.position(p);
 	}
 	
 //	@Override
@@ -37,7 +44,7 @@ public class Rectangle extends BasicNode implements Node {
 	@Override
 	public void draw(Camera camera) {
 		update();
-		((AABB)bounds).update();
+		((BoundingBox)bounds).update();
 		camera.update();
 		sr.setProjectionMatrix(camera.combined);
 		sr.begin(ShapeType.Rectangle);
@@ -47,9 +54,9 @@ public class Rectangle extends BasicNode implements Node {
 		
 		sr.begin(ShapeType.Point);
 		sr.setColor(1, 1, 1, 1);
-		sr.point(((AABB)bounds).lower().x, ((AABB)bounds).lower().y, ((AABB)bounds).lower().z);
+		sr.point(((BoundingBox)bounds).lower().x, ((BoundingBox)bounds).lower().y, ((BoundingBox)bounds).lower().z);
 		sr.setColor(0, 1, 1, 1);
-		sr.point(((AABB)bounds).upper().x, ((AABB)bounds).upper().y, ((AABB)bounds).upper().z);
+		sr.point(((BoundingBox)bounds).upper().x, ((BoundingBox)bounds).upper().y, ((BoundingBox)bounds).upper().z);
 		sr.end();
 	}
 	

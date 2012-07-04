@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
+import com.sandbox.gameplay.bounds.Bounds;
 
 public interface Node {
 	public Bounds bounds();
@@ -11,6 +12,8 @@ public interface Node {
 	public void position(Vector3 v);
 	public Vector3 velocity();
 	public void velocity(Vector3 v);
+	public Vector3 friction();
+	public void friction(Vector3 v);
 	public void target(Vector3 t);
 	public void target(int x, int y);
 	public void target(float x, float y);
@@ -30,5 +33,6 @@ public interface Node {
 	public float maxVelocity();
 	public Neighborhood neighborhood();
 	public void neighborhood(Neighborhood n);
+	public void update();
 	public void draw(Camera camera);
 }

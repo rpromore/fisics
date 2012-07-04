@@ -9,11 +9,10 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.sandbox.Sandbox;
-import com.sandbox.gameplay.BasicNode;
-import com.sandbox.gameplay.Node;
 import com.sandbox.gameplay.Nodes;
+import com.sandbox.gameplay.SeparatingAxisTheorem;
+import com.sandbox.gameplay.SweepAndPrune;
 import com.sandbox.gameplay.node2D.Circle;
-import com.sandbox.gameplay.node2D.Rectangle;
 
 public class TestScreen extends AbstractScreen {
 	Nodes shapes;
@@ -31,43 +30,37 @@ public class TestScreen extends AbstractScreen {
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.update(true);
 		
-		shapes = new Nodes();
-		float r = 1f;
+		shapes = new Nodes(new SweepAndPrune(), new SeparatingAxisTheorem());
+		float r = 0f;
 		
 		Circle ass = new Circle(0, 0, new BigDecimal("127.5632"), new BigDecimal("127.5632")); /*1.27562*Math.pow(10, 2), 1.27562*Math.pow(10, 2));*/
-		ass.mass(new BigDecimal("59736000000000"));
+//		ass.mass(new BigDecimal("59736000000000"));
+//		ass.mass(new BigDecimal("4736000000000"));
+		ass.mass(new BigDecimal("1"));
 		ass.velocity(new Vector3(0, 0, 0));
 		ass.restitution(r);
 		shapes.add(ass);
 		
 		Circle ass2 = new Circle(200, 0, new BigDecimal("10"), new BigDecimal("10"));
 		ass2.mass(new BigDecimal("100"));
-		ass2.velocity(new Vector3(-3, 0, 0));
 		ass2.restitution(r);
 		shapes.add(ass2);
 		
-		Rectangle ass3 = new Rectangle(0, 200, new BigDecimal("10"), new BigDecimal("10"));
-		ass3.velocity(new Vector3(0, 0, 0));
+		Circle ass3 = new Circle(-100, 0, new BigDecimal("10"), new BigDecimal("10"));
+		ass3.mass(new BigDecimal("100"));
 		ass3.restitution(r);
-//		shapes.add(ass3);
-		
-		Rectangle ass4 = new Rectangle(0, -200, new BigDecimal("10"), new BigDecimal("10"));
-		ass4.velocity(new Vector3(0, 0, 0));
-		ass4.restitution(r);
-//		shapes.add(ass4);
+		shapes.add(ass3);
 		
 		Random gen = new Random();
 		
 		int max = 200;
 		int min = -200;
 		
-//		for( int i = 0; i < 10; i++ ) {
-//			float x = gen.nextInt(max - min + 1) + min;
-//			float y = gen.nextInt(max - min + 1) + min;
-//			Circle a = new Circle(x, y, new BigDecimal("10"), new BigDecimal("10"));
-//			a.velocity(new Vector3(0, 0, 0));
-//			a.restitution(r);
-//			shapes.add(a);
+//		for( int i = 0; i < 200; i++ ) {
+//			Circle test = new Circle((gen.nextInt(max - min + 1) + min), (gen.nextInt(max - min + 1) + min), new BigDecimal("10"), new BigDecimal("10"));
+//			test.mass(new BigDecimal("100"));
+//			test.restitution(r);
+//			shapes.add(test);
 //		}
 		
 	}
@@ -80,38 +73,21 @@ public class TestScreen extends AbstractScreen {
 		camera.update();
 		camera.apply(gl);
 		
-//		Draw draw = new Draw(camera);
-//		draw.update();
-		
 		batch.begin();
 		batch.enableBlending();
 		batch.setProjectionMatrix(camera.combined);
 		
 //		for( Node n : shapes.getNeighbors() ) {
-//			n.move();
+//			n.update();
 //			n.draw(camera);
 //		}
 		
-//		rectangle.colliding();
-//		triangle.colliding();
-		
-//		System.out.println("RECTANGLE");
-//		rectangle.draw(camera);
-//		System.out.println("TRIANGLE");
-//		triangle.draw(camera);
-		
-		for( Node n : shapes.getNeighbors() ) {
-			((BasicNode)n).colliding();
-		}
-		for( Node n : shapes.getNeighbors() ) {
-			n.draw(camera);
-		}
+		shapes.update(camera);
 		
 		batch.end();
 		
 		handleInput();
 		
-		stage.clear();
 		super.render(delta);
 		
 		try {
@@ -128,6 +104,7 @@ public class TestScreen extends AbstractScreen {
 					Gdx.input.getY(), 0));
 			shapes.get(1).position(_touchPoint);	
 			shapes.get(1).velocity(new Vector3(0, 0, 0));
+			shapes.get(1).acceleration(new Vector3(0, 0, 0));
 		}
 
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
@@ -166,18 +143,20 @@ public class TestScreen extends AbstractScreen {
 			if (sleep > 2)
 				sleep -= 1;
 		}
-//		if (Gdx.input.isKeyPressed(Input.Keys.F3))
-//			nodes.get(0).mass(nodes.get(0).mass().add(new BigInteger("1000000000000")));
-//		if (Gdx.input.isKeyPressed(Input.Keys.F4))
-//			nodes.get(0).mass(nodes.get(0).mass().subtract(new BigInteger("1000000000000")));
-//		if (Gdx.input.isKeyPressed(Input.Keys.L))
-//			nodes.get(0).velocity(nodes.get(0).velocity().add(new Vector3(.1f, 0, 0)));
-//		if (Gdx.input.isKeyPressed(Input.Keys.I))
-//			nodes.get(0).velocity(nodes.get(0).velocity().add(new Vector3(0, .1f, 0)));
-//		if (Gdx.input.isKeyPressed(Input.Keys.J))
-//			nodes.get(0).velocity(nodes.get(0).velocity().sub(new Vector3(.1f, 0, 0)));
-//		if (Gdx.input.isKeyPressed(Input.Keys.K))
-//			nodes.get(0).velocity(nodes.get(0).velocity().sub(new Vector3(0, .1f, 0)));
+		if (Gdx.input.isKeyPressed(Input.Keys.F3))
+			shapes.get(0).mass(shapes.get(0).mass().add(new BigDecimal("1000000000000")));
+		if (Gdx.input.isKeyPressed(Input.Keys.F4))
+			shapes.get(0).mass(shapes.get(0).mass().subtract(new BigDecimal("1000000000000")));
+		if (Gdx.input.isKeyPressed(Input.Keys.L))
+			shapes.get(1).velocity(shapes.get(1).velocity().add(new Vector3(.1f, 0, 0)));
+		if (Gdx.input.isKeyPressed(Input.Keys.I))
+			shapes.get(1).velocity(shapes.get(1).velocity().add(new Vector3(0, .1f, 0)));
+		if (Gdx.input.isKeyPressed(Input.Keys.J))
+			shapes.get(1).velocity(shapes.get(1).velocity().sub(new Vector3(.1f, 0, 0)));
+		if (Gdx.input.isKeyPressed(Input.Keys.K))
+			shapes.get(1).velocity(shapes.get(1).velocity().sub(new Vector3(0, .1f, 0)));
+		
+		System.out.println(shapes.get(0).mass());
 	}
 
 }

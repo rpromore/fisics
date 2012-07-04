@@ -1,14 +1,13 @@
 package com.sandbox.gameplay.bounds;
 
 import com.badlogic.gdx.math.Vector3;
-import com.sandbox.gameplay.Bounds;
 import com.sandbox.gameplay.Node;
 
-public class AABB extends Bounds {
+public class BoundingBox extends Bounds {
 	private Vector3 lower, upper, penetration;
 	private Node node;
 	
-	public AABB(Node n) {
+	public BoundingBox(Node n) {
 		node = n;
 		lower = new Vector3();
 		upper = new Vector3();
@@ -56,7 +55,7 @@ public class AABB extends Bounds {
 	}
 	
 	@Override
-	public final boolean intersects(final AABB aabb) {
+	public final boolean intersects(final BoundingBox aabb) {
 		if (!((lower.x > aabb.upper.x) || (aabb.lower.x > upper.x)
 				|| (lower.y > aabb.upper.y) || (aabb.lower.y > upper.y)
 				|| (lower.z > aabb.upper.z) || (aabb.lower.z > upper.z))) {
@@ -97,11 +96,17 @@ public class AABB extends Bounds {
 	}
 	
 	@Override
-	public final boolean intersects(final Circle other) {
+	public final boolean intersects(final BoundingSphere other) {
 		return false;
 	}
 
 	public Vector3 penetration() {
 		return penetration;
+	}
+
+	@Override
+	public float depth() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }
